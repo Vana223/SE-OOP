@@ -1,4 +1,8 @@
 public class task {
+    /**
+     * Клас для 16-річних подання цілісних значень координат
+     * @param args
+     */
     public static void main(String[] args) {
         double v0 = 10;
         double alpha = Math.toRadians(45);
