@@ -90,4 +90,21 @@ import java.util.List;
         }
     }
 
+    public String formatResultText() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Initial velocity: ").append(v0).append("\n");
+        sb.append("Launch angle: ").append(alpha).append("\n");
+        sb.append("Gravity: ").append(g).append("\n");
+        sb.append("Coordinates:\n");
+        for (int i = 0; i < coordinates.length; i++) {
+            sb.append("Time ").append(i).append(": x = ").append(coordinates[i][0]).append(", y = ").append(coordinates[i][1]).append("\n");
+        }
+        return sb.toString();
+    }
+
+    public void printFormattedResult() {
+        System.out.println(formatResultText());
+    }
+
+
 }
