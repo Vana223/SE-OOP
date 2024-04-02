@@ -1,16 +1,24 @@
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Клас для представлення результутату 16-річних цілісних значень координат 
  */
 
-public class Result implements Serializable {
-    private double v0;
-    private double alpha;
-    private double g;
-    private double[][] coordinates;
+    public class Result implements Serializable {
+        private List<Result> results;
+        private double v0;
+        private double alpha;
+        private double g;
+        private double[][] coordinates;
 
     public Result(double v0, double alpha, double g, double[][] coordinates) {
         this.v0 = v0;
@@ -50,4 +58,36 @@ public class Result implements Serializable {
         result = 31 * result + Arrays.deepHashCode(coordinates);
         return result;
     }
+
+    public Result() {
+        results = new ArrayList<>();
+    }
+
+    public void addResult(Result result) {
+        results.add(result);
+    }
+
+    public List<Result> getResults() {
+        return results;
+    }
+
+    public void saveResults(String filename) {
+        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(filename))) {
+            outputStream.writeObject(results);
+            System.out.println("Результати збережено у файл " + filename);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Метод для десеріалізації
+    public void loadResults(String filename) {
+        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(filename))) {
+            results = (List<Result>) inputStream.readObject();
+            System.out.println("Результати відновлено з файлу " + filename);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

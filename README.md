@@ -247,3 +247,105 @@ public class Test {
 ![](/screen/Screenshot_2.png)
 
 ![](/screen/Test.png)
+
+# Завдання 3
+
+### Забезпечити розміщення результатів обчислень у колекції з можливістю збереження/відновлення
+
+````java
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Клас для представлення результутату 16-річних цілісних значень координат 
+ */
+
+    public class Result implements Serializable {
+        private List<Result> results;
+        private double v0;
+        private double alpha;
+        private double g;
+        private double[][] coordinates;
+
+    public Result(double v0, double alpha, double g, double[][] coordinates) {
+        this.v0 = v0;
+        this.alpha = alpha;
+        this.g = g;
+        this.coordinates = coordinates;
+    }
+
+    public double getV0() {
+        return v0;
+    }
+
+    public double getAlpha() {
+        return alpha;
+    }
+
+    public double getG() {
+        return g;
+    }
+
+    public double[][] getCoordinates() {
+        return coordinates;
+    }
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Result result = (Result) o;
+        return Double.compare(result.v0, v0) == 0 &&
+                Double.compare(result.alpha, alpha) == 0 &&
+                Double.compare(result.g, g) == 0 &&
+                Arrays.deepEquals(result.coordinates, coordinates);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(v0, alpha, g);
+        result = 31 * result + Arrays.deepHashCode(coordinates);
+        return result;
+    }
+
+    public Result() {
+        results = new ArrayList<>();
+    }
+
+    public void addResult(Result result) {
+        results.add(result);
+    }
+
+    public List<Result> getResults() {
+        return results;
+    }
+}
+
+````
+
+### Використовуючи шаблон проектування Factory Method (Virtual Constructor), розробити ієрархію, що передбачає розширення рахунок додавання нових відображуваних класів
+
+````java
+public interface ResultFactory {
+    Result createResult(double v0, double alpha, double g, double[][] coordinates);
+}
+````
+
+````java
+public class CartesianResultFactory implements ResultFactory {
+    @Override
+    public Result createResult(double v0, double alpha, double g, double[][] coordinates) {
+        return new Result(v0, alpha, g, coordinates);
+    }
+}
+````
+
+````java
+public class PolarResultFactory implements ResultFactory {
+    @Override
+    public Result createResult(double v0, double alpha, double g, double[][] coordinates) {
+        return new Result(v0, alpha, g, coordinates);
+    }
+}
+````
