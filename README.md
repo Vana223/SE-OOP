@@ -507,3 +507,124 @@ import java.util.List;
 ### Результати:
 
 ![](/screen/Screenshot_3.png)
+
+# Завдання 4
+
+### Використовуючи шаблон проектування Factory Method (Virtual Constructor), розширити ієрархію похідними класами, реалізують методи для подання результатів у вигляді текстової таблиці. Параметри відображення таблиці мають визначатися користувачем
+
+### Продемонструвати заміщення (перевизначення, overriding), поєднання (перевантаження, overloading), динамічне призначення методів (Пізнє зв'язування, поліморфізм, dynamic method dispatch)
+
+### Забезпечити діалоговий інтерфейс із користувачем
+
+### Розробити клас для тестування основної функціональності
+
+```` java
+public class CartesianTableResultFactory implements TableResultFactory {
+
+    @Override
+    public String formatResultAsTable(Result result, int columns) {
+        StringBuilder sb = new StringBuilder();
+        double[][] coordinates = result.getCoordinates();
+        int rows = coordinates.length;
+
+        sb.append("Time\tX\tY\n");
+
+        for (int i = 0; i < rows; i++) {
+            sb.append(i).append("\t");
+            sb.append(coordinates[i][0]).append("\t");
+            sb.append(coordinates[i][1]).append("\n");
+        }
+
+        return sb.toString();
+    }
+
+    @Override
+    public Result createResult(double v0, double alpha, double g, double[][] coordinates) {
+        throw new UnsupportedOperationException("Unimplemented method 'createResult'");
+    }
+
+    @Override
+    public String formatResult(Result result) {
+        throw new UnsupportedOperationException("Unimplemented method 'formatResult'");
+    }
+}
+````
+
+```` java
+public class PolarTableResultFactory implements TableResultFactory {
+    // Попередні методи
+
+    @Override
+    public String formatResultAsTable(Result result, int columns) {
+        StringBuilder sb = new StringBuilder();
+        double[][] coordinates = result.getCoordinates();
+        int rows = coordinates.length;
+
+        sb.append("Time\tR\tTheta\n");
+
+        for (int i = 0; i < rows; i++) {
+            double x = coordinates[i][0];
+            double y = coordinates[i][1];
+            double r = Math.sqrt(x * x + y * y);
+            double theta = Math.atan2(y, x);
+            sb.append(i).append("\t");
+            sb.append(r).append("\t");
+            sb.append(theta).append("\n");
+        }
+
+        return sb.toString();
+    }
+
+    @Override
+    public Result createResult(double v0, double alpha, double g, double[][] coordinates) {
+        throw new UnsupportedOperationException("Unimplemented method 'createResult'");
+    }
+
+    @Override
+    public String formatResult(Result result) {
+        throw new UnsupportedOperationException("Unimplemented method 'formatResult'");
+    }
+}
+````
+
+```` java
+public interface TableResultFactory extends ResultFactory {
+    String formatResultAsTable(Result result, int columns);
+}
+
+````
+
+```` java
+import java.util.Scanner;
+
+public class demo2 {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Введіть кількість стовпців для таблиці: ");
+        int columns = scanner.nextInt();
+
+        ResultFactory resultFactory;
+        System.out.println("Виберіть тип фабрики (1 - Cartesian, 2 - Polar): ");
+        int factoryType = scanner.nextInt();
+        if (factoryType == 1) {
+            resultFactory = new CartesianTableResultFactory();
+        } else {
+            resultFactory = new PolarTableResultFactory();
+        }
+
+        solver solver = new solver(10, Math.toRadians(45), 9.8);
+        Result result = solver.solve(16);
+
+        String formattedResult = resultFactory.formatResultAsTable(result, columns);
+        System.out.println("Formatted Result Table:");
+        System.out.println(formattedResult);
+
+        scanner.close();
+    }
+}
+````
+
+### Результати: 
+
+![]()

@@ -81,6 +81,7 @@ import java.util.List;
     }
 
     // Метод для десеріалізації
+    @SuppressWarnings("unchecked")
     public void loadResults(String filename) {
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(filename))) {
             results = (List<Result>) inputStream.readObject();
