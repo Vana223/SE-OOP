@@ -626,5 +626,6 @@ public class demo2 {
 ````
 
 ### Результати: 
+![](/screen/Screenshot_4.png)
 
-![]()
+![](/screen/Test2.png)

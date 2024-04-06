@@ -2,6 +2,8 @@
  * Клас для агрегування результатів 16-річних подання цілісних значень координат
  */
 
+package src.Task16.src2;
+
 public class solver {
     
     private double v0;

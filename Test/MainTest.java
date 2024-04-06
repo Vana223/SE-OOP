@@ -2,10 +2,8 @@ package Test;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import junit.framework.Assert;
 import java.io.IOException;
-import src.Task16.src.*;
-
+import src.Task16.src2.*;
 public class MainTest {
     @Test
     public void testFormatting() {
@@ -17,14 +15,8 @@ public class MainTest {
         
         String cartesianTable = cartesianFactory.formatResultAsTable(result, 3);
         String polarTable = polarFactory.formatResultAsTable(result, 3);
-        
-        // Перевіряємо, чи форматується результат у вигляді текстової таблиці
-        // для обох типів фабрик
-        // Додайте ваші твердження тут
-        
-        // Приклад:
-        // assertEquals("Expected Cartesian table", expectedCartesianTable, cartesianTable);
-        // assertEquals("Expected Polar table", expectedPolarTable, polarTable);
+        assertEquals("Expected Cartesian table", cartesianTable);
+        assertEquals("Expected Polar table", polarTable);
     }
     
     @Test
@@ -36,12 +28,7 @@ public class MainTest {
         saveResult(expectedResult, filename);
         
         Result restoredResult = restoreResult(filename);
-        
-        // Перевіряємо, чи відновлений результат співпадає з вихідним
-        // Додайте ваші твердження тут
-        
-        // Приклад:
-        // assertEquals("Expected restored result to be equal to expected result", expectedResult, restoredResult);
+        assertEquals("Expected restored result to be equal to expected result", expectedResult, restoredResult);
     }
     
     private static void saveResult(Result result, String filename) {

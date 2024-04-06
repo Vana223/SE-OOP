@@ -1,3 +1,4 @@
+package src.Task16.src2;
 import java.util.Scanner;
 
 public class demo2 {

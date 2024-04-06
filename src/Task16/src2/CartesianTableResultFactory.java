@@ -1,3 +1,5 @@
+package src.Task16.src2;
+
 public class CartesianTableResultFactory implements TableResultFactory {
 
     @Override

@@ -1,3 +1,5 @@
+package src.Task16.src2;
+
 public class PolarTableResultFactory implements TableResultFactory {
     // Попередні методи
 

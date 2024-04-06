@@ -1,3 +1,4 @@
+package src.Task16.src2;
 public class task {
     /**
      * Клас для 16-річних подання цілісних значень координат
