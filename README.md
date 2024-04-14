@@ -626,6 +626,362 @@ public class demo2 {
 ````
 
 ### Результати: 
+
 ![](/screen/Screenshot_4.png)
 
 ![](/screen/Test2.png)
+
+# Завдання 5
+
+### Реалізувати можливість скасування (undo) операцій (команд)
+
+### Продемонструвати поняття "макрокоманда"
+
+### При розробці програми використовувати шаблон Singletone
+
+### Забезпечити діалоговий інтерфейс із користувачем
+
+### Розробити клас для тестування функціональності програми
+
+```` java
+package src.Task16.src2;
+
+public class AddResultCommand implements Command {
+    private Result result;
+
+    public AddResultCommand(double v0, double alpha, double g, double[][] coordinates) {
+        this.result = new Result(v0, alpha, g, coordinates);
+    }
+
+    @Override
+    public void execute() {
+        result.saveResult();
+    }
+
+    @Override
+    public void undo() {
+        result.deleteResult();
+    }
+}
+````
+
+```` java
+package src.Task16.src2;
+
+public interface Command {
+    void execute();
+    void undo();
+}
+````
+
+```` java
+package src.Task16.src2;
+
+import java.util.*;
+
+public class CommandManager {
+    private static CommandManager instance;
+    private Deque<Command> commandStack = new ArrayDeque<>();
+
+    private CommandManager() {}
+
+    public static CommandManager getInstance() {
+        if (instance == null) {
+            instance = new CommandManager();
+        }
+        return instance;
+    }
+
+    public void executeCommand(Command command) {
+        command.execute();
+        commandStack.push(command);
+    }
+
+    public void undo() {
+        if (!commandStack.isEmpty()) {
+            Command command = commandStack.pop();
+            command.undo();
+        } else {
+            System.out.println("No commands to undo.");
+        }
+    }
+}
+
+````
+
+```` java
+package src.Task16.src2;
+
+interface CompositeCommand extends Command {
+    void addCommand(Command command);
+}
+
+````
+
+```` java
+package src.Task16.src2;
+
+import java.util.*;
+
+public class CompositeCommandImpl implements CompositeCommand {
+    private List<Command> commands = new ArrayList<>();
+
+    @Override
+    public void execute() {
+        for (Command command : commands) {
+            command.execute();
+        }
+    }
+
+    @Override
+    public void undo() {
+        for (int i = commands.size() - 1; i >= 0; i--) {
+            commands.get(i).undo();
+        }
+    }
+
+    @Override
+    public void addCommand(Command command) {
+        commands.add(command);
+    }
+}
+````
+
+```` java
+package src.Task16.src2;
+
+public class RemoveResultCommand implements Command {
+    private int index;
+    private Result removedResult;
+
+    public RemoveResultCommand(int index) {
+        this.index = index;
+    }
+
+    @Override
+    public void execute() {
+        removedResult = Result.getResult(index);
+        removedResult.deleteResult();
+    }
+
+    @Override
+    public void undo() {
+        removedResult.saveResult();
+    }
+}
+````
+
+```` java
+package src.Task16.src2;
+
+import java.util.*;
+
+public class demo3 {
+    private static CommandManager commandManager = CommandManager.getInstance();
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        boolean exit = false;
+
+        while (!exit) {
+            displayMenu();
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (choice) {
+                case 1:
+                    addResultCommand(scanner);
+                    break;
+                case 2:
+                    removeResultCommand(scanner);
+                    break;
+                case 3:
+                    undoCommand();
+                    break;
+                case 4:
+                    executeMacroCommand(scanner);
+                    break;
+                case 5:
+                    exit = true;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+
+        scanner.close();
+    }
+
+    private static void displayMenu() {
+        System.out.println("Menu:");
+        System.out.println("1. Add Result");
+        System.out.println("2. Remove Result");
+        System.out.println("3. Undo");
+        System.out.println("4. Execute Macro Command");
+        System.out.println("5. Exit");
+        System.out.println("Enter your choice:");
+    }
+
+    private static void addResultCommand(Scanner scanner) {
+        System.out.println("Enter data for adding result:");
+        // Get data from user
+        double v0 = scanner.nextDouble();
+        double alpha = scanner.nextDouble();
+        double g = scanner.nextDouble();
+        int timeSteps = scanner.nextInt();
+
+        double[][] coordinates = new double[timeSteps][2];
+        for (int i = 0; i < timeSteps; i++) {
+            double t = i;
+            double x = v0 * Math.cos(alpha) * t;
+            double y = v0 * Math.sin(alpha) * t - (g * t * t) / 2;
+
+            coordinates[i][0] = x;
+            coordinates[i][1] = y;
+        }
+
+        Command command = new AddResultCommand(v0, alpha, g, coordinates);
+        commandManager.executeCommand(command);
+    }
+
+    private static void removeResultCommand(Scanner scanner) {
+        System.out.println("Enter index of result to remove:");
+        int index = scanner.nextInt();
+        Command command = new RemoveResultCommand(index);
+        commandManager.executeCommand(command);
+    }
+
+    private static void undoCommand() {
+        commandManager.undo();
+    }
+
+    private static void executeMacroCommand(Scanner scanner) {
+        System.out.println("Executing Macro Command...");
+        CompositeCommandImpl macroCommand = new CompositeCommandImpl();
+
+        System.out.println("Enter number of commands to include in macro:");
+        int numCommands = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+        for (int i = 0; i < numCommands; i++) {
+            System.out.println("Enter command (1 - Add Result, 2 - Remove Result):");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+            switch (choice) {
+                case 1:
+                    macroCommand.addCommand(createAddResultCommand(scanner));
+                    break;
+                case 2:
+                    macroCommand.addCommand(createRemoveResultCommand(scanner));
+                    break;
+                default:
+                    System.out.println("Invalid command choice.");
+            }
+        }
+
+        commandManager.executeCommand(macroCommand);
+    }
+
+    private static Command createAddResultCommand(Scanner scanner) {
+        System.out.println("Enter data for adding result:");
+        // Get data from user
+        double v0 = scanner.nextDouble();
+        double alpha = scanner.nextDouble();
+        double g = scanner.nextDouble();
+        int timeSteps = scanner.nextInt();
+
+        double[][] coordinates = new double[timeSteps][2];
+        for (int i = 0; i < timeSteps; i++) {
+            double t = i;
+            double x = v0 * Math.cos(alpha) * t;
+            double y = v0 * Math.sin(alpha) * t - (g * t * t) / 2;
+
+            coordinates[i][0] = x;
+            coordinates[i][1] = y;
+        }
+
+        return new AddResultCommand(v0, alpha, g, coordinates);
+    }
+
+    private static Command createRemoveResultCommand(Scanner scanner) {
+        System.out.println("Enter index of result to remove:");
+        int index = scanner.nextInt();
+        return new RemoveResultCommand(index);
+    }
+}
+````
+
+```` java
+package Test;
+
+import static org.junit.Assert.*;
+import org.junit.Test;
+import src.Task16.src2.*;
+
+public class MainTest2 {
+
+    @Test
+    public void testUndoCommand() {
+        CommandManager commandManager = CommandManager.getInstance();
+
+        // Створення команди на додавання результату
+        double v0 = 10;
+        double alpha = Math.toRadians(45);
+        double g = 9.8;
+        double[][] coordinates = new double[16][2];
+        for (int i = 0; i < 16; i++) {
+            double t = i;
+            coordinates[i][0] = v0 * Math.cos(alpha) * t;
+            coordinates[i][1] = v0 * Math.sin(alpha) * t - (g * t * t) / 2;
+        }
+        Command addResultCommand = new AddResultCommand(v0, alpha, g, coordinates);
+
+        // Виконання команди на додавання результату
+        commandManager.executeCommand(addResultCommand);
+
+        // Виконання команди скасування
+        commandManager.undo();
+
+        // Перевірка, чи був результат видалений
+        assertNull(Result.getResult(0));
+    }
+
+    @Test
+    public void testExecuteMacroCommand() {
+        CommandManager commandManager = CommandManager.getInstance();
+
+        // Створення результату для видалення
+        double v0 = 10;
+        double alpha = Math.toRadians(45);
+        double g = 9.8;
+        double[][] coordinates = new double[16][2];
+        for (int i = 0; i < 16; i++) {
+            double t = i;
+            coordinates[i][0] = v0 * Math.cos(alpha) * t;
+            coordinates[i][1] = v0 * Math.sin(alpha) * t - (g * t * t) / 2;
+        }
+        Result result = new Result(v0, alpha, g, coordinates);
+
+        // Збереження результату
+        result.saveResult();
+
+        // Створення команди на видалення результату
+        Command removeResultCommand = new RemoveResultCommand(0);
+
+        // Створення макрокоманди
+        CompositeCommandImpl macroCommand = new CompositeCommandImpl();
+        macroCommand.addCommand(removeResultCommand);
+
+        // Виконання макрокоманди
+        commandManager.executeCommand(macroCommand);
+
+        // Перевірка, чи був результат видалений
+        assertNull(Result.getResult(0));
+    }
+}
+````
+
+### Результати:
+
+![](/screen/Screenshot_5.png)
+
+![](/screen/Test3.png)

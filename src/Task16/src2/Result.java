@@ -14,12 +14,12 @@ import java.util.List;
  * Клас для представлення результутату 16-річних цілісних значень координат 
  */
 
-    public class Result implements Serializable {
-        private List<Result> results;
-        private double v0;
-        private double alpha;
-        private double g;
-        private double[][] coordinates;
+public class Result implements Serializable {
+    private static List<Result> results = new ArrayList<>();
+    private double v0;
+    private double alpha;
+    private double g;
+    private double[][] coordinates;
 
     public Result(double v0, double alpha, double g, double[][] coordinates) {
         this.v0 = v0;
@@ -108,5 +108,21 @@ import java.util.List;
         System.out.println(formatResultText());
     }
 
+    public void saveResult() {
+        results.add(this);
+        System.out.println("Result saved.");
+    }
+
+    public void deleteResult() {
+        results.remove(this);
+        System.out.println("Result deleted.");
+    }
+
+    public static Result getResult(int index) {
+        if (index >= 0 && index < results.size()) {
+            return results.get(index);
+        }
+        return null;
+    }
 
 }
